@@ -13,6 +13,7 @@ export default defineConfig(({ mode }) => {
     env.VITE_MEDUSA_STOREFRONT_URL || "http://localhost:8000"
   const PUBLISHABLE_API_KEY = env.VITE_PUBLISHABLE_API_KEY || ""
   const TALK_JS_APP_ID = env.VITE_TALK_JS_APP_ID || ""
+  const TALK_JS_DISABLED = env.VITE_DISABLE_TALKJS === "true" || !TALK_JS_APP_ID
   const DISABLE_SELLERS_REGISTRATION =
     env.VITE_DISABLE_SELLERS_REGISTRATION || "false"
 
@@ -36,6 +37,7 @@ export default defineConfig(({ mode }) => {
       __STOREFRONT_URL__: JSON.stringify(STOREFRONT_URL),
       __PUBLISHABLE_API_KEY__: JSON.stringify(PUBLISHABLE_API_KEY),
       __TALK_JS_APP_ID__: JSON.stringify(TALK_JS_APP_ID),
+      __TALK_JS_DISABLED__: JSON.stringify(String(TALK_JS_DISABLED)),
       __DISABLE_SELLERS_REGISTRATION__: JSON.stringify(
         DISABLE_SELLERS_REGISTRATION
       ),

@@ -29,7 +29,9 @@ const ProviderContent = ({
     })
   }, [seller])
 
-  if (!__TALK_JS_APP_ID__ || !seller) return <>{children}</>
+  // TalkJS disabled when VITE_DISABLE_TALKJS=true or VITE_TALK_JS_APP_ID is not set
+  if (__TALK_JS_DISABLED__ === "true" || !__TALK_JS_APP_ID__ || !seller)
+    return <>{children}</>
 
   return (
     <Session appId={__TALK_JS_APP_ID__} syncUser={syncUser}>

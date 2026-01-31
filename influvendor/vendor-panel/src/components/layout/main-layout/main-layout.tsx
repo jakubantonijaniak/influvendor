@@ -32,14 +32,27 @@ import { ImageAvatar } from "../../common/image-avatar"
 import { useUnreads } from "@talkjs/react"
 
 export const MainLayout = () => {
+  if (__TALK_JS_DISABLED__ === "true") {
+    return (
+      <Shell>
+        <MainSidebar unreadCount={0} />
+      </Shell>
+    )
+  }
+  return <MainLayoutWithTalkJS />
+}
+
+const MainLayoutWithTalkJS = () => {
+  const unreadMessages = useUnreads()
+  const unreadCount = unreadMessages?.length ?? 0
   return (
     <Shell>
-      <MainSidebar />
+      <MainSidebar unreadCount={unreadCount} />
     </Shell>
   )
 }
 
-const MainSidebar = () => {
+const MainSidebar = ({ unreadCount = 0 }: { unreadCount?: number }) => {
   return (
     <aside className="flex flex-1 flex-col justify-between overflow-y-auto">
       <div className="flex flex-1 flex-col">
@@ -51,7 +64,7 @@ const MainSidebar = () => {
         </div>
         <div className="flex flex-1 flex-col justify-between">
           <div className="flex flex-1 flex-col">
-            <CoreRouteSection />
+            <CoreRouteSection unreadCount={unreadCount} />
             <ExtensionRouteSection />
           </div>
           <UtilitySection />
@@ -97,10 +110,8 @@ const Header = () => {
   )
 }
 
-const useCoreRoutes = (): Omit<INavItem, "pathname">[] => {
+const useCoreRoutes = (unreadCount: number): Omit<INavItem, "pathname">[] => {
   const { t } = useTranslation()
-
-  const unreadMessages = useUnreads()
 
   return [
     {
@@ -185,7 +196,7 @@ const useCoreRoutes = (): Omit<INavItem, "pathname">[] => {
     },
     {
       icon: <ChatBubbleLeftRight />,
-      label: `Messages ${unreadMessages?.length && unreadMessages?.length > 0 ? `(${unreadMessages?.length})` : ""}`,
+      label: `Messages ${unreadCount > 0 ? `(${unreadCount})` : ""}`,
       to: "/messages",
     },
     {
@@ -252,8 +263,12 @@ const Searchbar = () => {
   )
 }
 
-const CoreRouteSection = () => {
-  const coreRoutes = useCoreRoutes()
+const CoreRouteSection = ({
+  unreadCount = 0,
+}: {
+  unreadCount?: number
+}) => {
+  const coreRoutes = useCoreRoutes(unreadCount)
 
   return (
     <nav className="flex flex-col gap-y-1 py-3">

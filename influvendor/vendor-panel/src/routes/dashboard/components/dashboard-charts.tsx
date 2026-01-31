@@ -82,20 +82,45 @@ const generateChartData = ({
   return res
 }
 
-export const DashboardCharts = ({
-  notFulfilledOrders,
-  fulfilledOrders,
-  reviewsToReply,
-}: {
+export const DashboardCharts = (props: {
   notFulfilledOrders: number
   fulfilledOrders: number
   reviewsToReply: any[]
 }) => {
+  if (__TALK_JS_DISABLED__ === "true") {
+    return <DashboardChartsContent {...props} unreadCount={0} />
+  }
+  return <DashboardChartsWithUnreads {...props} />
+}
+
+const DashboardChartsWithUnreads = (props: {
+  notFulfilledOrders: number
+  fulfilledOrders: number
+  reviewsToReply: any[]
+}) => {
+  const unreadMessages = useUnreads()
+  return (
+    <DashboardChartsContent
+      {...props}
+      unreadCount={unreadMessages?.length ?? 0}
+    />
+  )
+}
+
+const DashboardChartsContent = ({
+  notFulfilledOrders,
+  fulfilledOrders,
+  reviewsToReply,
+  unreadCount = 0,
+}: {
+  notFulfilledOrders: number
+  fulfilledOrders: number
+  reviewsToReply: any[]
+  unreadCount?: number
+}) => {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [filters, setFilters] = useState(["customers", "orders"])
-
-  const unreadMessages = useUnreads()
 
   const from = (searchParams.get("from") ||
     format(addDays(new Date(), -7), "yyyy-MM-dd")) as unknown as Date
@@ -193,7 +218,7 @@ export const DashboardCharts = ({
               className="w-full justify-between py-4 h-full h-full"
             >
               <div className="flex gap-4 items-center">
-                <Badge>{unreadMessages?.length || 0}</Badge>Unread messages
+                <Badge>{unreadCount}</Badge>Unread messages
               </div>
               <TriangleRightMini color="grey" />
             </Button>

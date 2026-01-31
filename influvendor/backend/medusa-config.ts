@@ -28,13 +28,14 @@ module.exports = defineConfig({
       resolve: '@mercurjs/commission',
       options: {}
     },
-    {
-      resolve: '@mercurjs/algolia',
-      options: {
-        apiKey: process.env.ALGOLIA_API_KEY,
-        appId: process.env.ALGOLIA_APP_ID
-      }
-    },
+    // Algolia disabled – remove the comment and block below to re-enable
+    // {
+    //   resolve: '@mercurjs/algolia',
+    //   options: {
+    //     apiKey: process.env.ALGOLIA_API_KEY,
+    //     appId: process.env.ALGOLIA_APP_ID
+    //   }
+    // },
     {
       resolve: '@mercurjs/reviews',
       options: {}
