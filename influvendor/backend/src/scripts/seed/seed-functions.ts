@@ -33,6 +33,7 @@ import {
 import { productsToInsert } from './seed-products'
 
 const countries = ['be', 'de', 'dk', 'se', 'fr', 'es', 'it', 'pl', 'cz', 'nl']
+const usCountries = ['us']
 
 export async function createAdminUser(container: MedusaContainer) {
   const authService = container.resolve(Modules.AUTH)
@@ -123,9 +124,7 @@ export async function createStore(
   })
 }
 export async function createRegions(container: MedusaContainer) {
-  const {
-    result: [region]
-  } = await createRegionsWorkflow(container).run({
+  const { result: regions } = await createRegionsWorkflow(container).run({
     input: {
       regions: [
         {
@@ -133,13 +132,20 @@ export async function createRegions(container: MedusaContainer) {
           currency_code: 'eur',
           countries,
           payment_providers: ['pp_system_default']
+        },
+        {
+          name: 'United States',
+          currency_code: 'usd',
+          countries: usCountries,
+          payment_providers: ['pp_system_default']
         }
       ]
     }
   })
 
+  const allCountries = [...countries, ...usCountries]
   const { result: taxRegions } = await createTaxRegionsWorkflow(container).run({
-    input: countries.map((country_code) => ({
+    input: allCountries.map((country_code) => ({
       country_code
     }))
   })
@@ -151,7 +157,9 @@ export async function createRegions(container: MedusaContainer) {
     }))
   })
 
-  return region
+  // Return US region so store default matches storefront NEXT_PUBLIC_DEFAULT_REGION 'us'
+  const usRegion = regions.find((r) => r.currency_code === 'usd') ?? regions[0]
+  return usRegion
 }
 
 export async function createPublishableKey(
